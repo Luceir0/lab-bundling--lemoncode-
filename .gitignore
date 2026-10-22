@@ -1,0 +1,31 @@
+# Dependencias (se reinstalan con npm install)
+node_modules
+
+# Salida del build (se regenera con npm run build)
+dist
+
+# Variables de entorno locales: pueden tener datos personales o secretos
+# .env y .env.production SÍ se suben: solo llevan valores públicos (VITE_*),
+# que de todas formas acaban escritos en el bundle
+.env.local
+.env.*.local
+*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Ficheros del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor (salvo la lista de extensiones recomendadas)
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Apuntes personales
+enunciado-paso-a-paso.md
