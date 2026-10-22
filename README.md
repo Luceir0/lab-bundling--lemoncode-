@@ -25,3 +25,9 @@ El hash se calcula a partir del contenido del fichero: si el código cambia, cam
 **¿Qué diferencia hay entre `npm start` y `npm run preview`? ¿Cuál usarías para comprobar que la versión de producción funciona?**
 
 `npm start` es el servidor de desarrollo: sirve los ficheros de `src/` tal cual, sin empaquetar ni minificar, y los recarga al guardar (por eso aparecen `client`, `env.mjs` y el `?t=<timestamp>`). `npm run preview` no compila nada: sirve lo que ya hay en `dist/`, que es exactamente lo que se subiría a producción. Para comprobar que la versión de producción funciona usaría `npm run build` + `npm run preview`.
+
+### 2 · Estilos con Sass
+
+**¿Por qué en desarrollo el CSS llega como un módulo de JavaScript y en producción como un fichero `.css`?**
+
+En desarrollo, Vite compila el `.scss` y lo envuelve en un módulo JS (`Content-Type: text/javascript`) que mete el CSS en un `<style>` del `<head>` con `updateStyle` y lo quita con `removeStyle`. Al ser un módulo, entra en el sistema de recarga en caliente (HMR): cuando cambio un color, Vite sólo vuelve a enviar ese módulo y se sustituye el `<style>` sin recargar la página (el `console.log` de `index.js` no se repite). En producción no hace falta HMR y lo que importa es el rendimiento, así que Vite extrae todo el CSS a `dist/assets/index-<hash>.css`, ya compilado (las variables `$tueste-900` se han sustituido por `#2e1a10`) y minificado, y lo enlaza con un `<link rel="stylesheet">`: el navegador puede descargarlo en paralelo, cachearlo por separado y aplicar los estilos sin esperar a ejecutar JavaScript.
