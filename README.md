@@ -6,11 +6,11 @@
 npm install
 ```
 
-| Script | Qué hace |
-|---|---|
-| `npm start` | Arranca el servidor de desarrollo de Vite en <http://localhost:5173>. Sirve `src/` sin empaquetar y recarga al guardar. |
-| `npm run build` | Genera la versión de producción en `dist/` (minificada y con hash en los nombres). |
-| `npm run preview` | Sirve la carpeta `dist/` en <http://localhost:4173> para probar la versión de producción. |
+| Script | Comando | Para qué sirve |
+|---|---|---|
+| `start` | `npm start` | Arranca el servidor de desarrollo de Vite en <http://localhost:5173>. Sirve `src/` sin empaquetar, comprueba los tipos y recarga al guardar. |
+| `build` | `npm run build` | Genera la versión de producción en `dist/` (minificada y con hash en los nombres). Falla si hay errores de tipos. |
+| `preview` | `npm run preview` | Sirve la carpeta `dist/` en <http://localhost:4173> para probar la versión de producción. |
 
 ## Respuestas
 
@@ -71,3 +71,86 @@ No basta: las variables se leen **al hacer el build** y se sustituyen por su val
 **¿Un *feature flag* desactivado sirve para "esconder" algo a los usuarios?**
 
 No es una forma fiable de esconder nada. En mi caso concreto `Envío gratis` **no** aparece en el bundle de producción: Vite sustituye `import.meta.env.VITE_SHOW_OFFERS` por `"false"`, la comparación `"false" === "true"` se resuelve al construir y el minificador elimina el banner como código muerto. Pero eso depende de cómo esté escrito el código: si el flag llegara en tiempo de ejecución (de una API, de `localStorage`…) o la comprobación fuera menos directa, el texto y la lógica irían en el JS y cualquiera podría leerlos o activarlos. Un flag sirve para decidir qué se muestra, no para proteger información: lo que no deba ver el usuario no debe llegar al navegador.
+
+## Salida final de `npm run build`
+
+```text
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 19 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/favicon-BlvYJjdG.svg      0.33 kB │ gzip:  0.21 kB
+dist/index.html                       1.32 kB │ gzip:  0.64 kB
+dist/assets/coffee-kqAJzOdl.jpg   2,081.12 kB
+dist/assets/index-qRAdAvCk.css        1.64 kB │ gzip:  0.84 kB
+dist/assets/index-DSifi2Nh.js       220.23 kB │ gzip: 68.96 kB
+
+✓ built in 311ms
+```
+
+## Checklist
+
+**Obligatorios**
+
+- [x] 1 · Proyecto desde cero con Vite (`start`, `build`, `preview`)
+- [x] 2 · Estilos con Sass (`@use`, variables, parcial de reset)
+- [x] 3 · Imágenes (logo SVG en el HTML, foto importada desde código)
+- [x] 4 · TypeScript con comprobación de tipos (`strict` + `vite-plugin-checker`)
+- [x] 5 · React con `@vitejs/plugin-react` (Fast Refresh)
+- [x] 6 · Variables de entorno (`.env`, `.env.production`, tipadas con `strictImportMetaEnv`)
+- [x] 7 · README y bitácora de IA
+
+**Opcionales**
+
+- [ ] Opcional 1 · Tailwind
+- [ ] Opcional 2 · Code splitting y análisis del bundle
+
+**Extras**
+
+- Tipografía Fraunces (Google Fonts) para el nombre de la tienda.
+- Favicon a partir del logo.
+
+## Bitácora de IA
+
+**Herramienta usada:** Claude Code (Claude Opus 5.5) dentro de VS Code, para organizar el enunciado, montar cada paso y redactar borradores de las respuestas, que luego he revisado comprobando en el navegador y en `dist/`.
+
+### Prompt
+
+"Incluye el modo estricto en tsconfig y montemos vite-plugin-checker"
+
+### Qué me dio
+
+Añadió `"strict": true` al `tsconfig.json`, instaló `vite-plugin-checker` y creó `vite.config.ts` con `checker({ typescript: true })`. Comprobó que con `const total: string = 3;` el build fallaba con `TS2322`.
+
+### Qué corregí y por qué
+
+El `tsconfig.json` que copié del enunciado no traía `strict`, aunque el propio enunciado habla de los errores del "modo estricto" (`Object is possibly 'null'`). La IA lo señaló al montar TypeScript pero no lo añadió hasta que se lo pedí: sin él TypeScript no habría avisado de esos `null`, así que lo activé.
+
+---
+
+### Prompt
+
+"En la parte de Paso 1: comprobar, no me queda muy claro qué es lo que hay que hacer después del build. ¿Podrías continuar?"
+
+### Qué me dio
+
+Un desglose de las comprobaciones del paso 1 (qué mirar en `dist/`, `preview` en el 4173, `start` en el 5173, el `304`, el `?t=` y `new Date(...)`), y además detectó dos fallos en mi `index.html`: faltaba la cabecera con el nombre de la tienda y había un acento grave suelto dentro del `<head>`.
+
+### Qué corregí y por qué
+
+El desglose lo usé tal cual, pero los dos fallos los arreglé yo en el HTML (añadir `<header><h1>Tueste</h1></header>` y borrar el carácter suelto), porque eran errores míos que el enunciado sí pedía.
+
+---
+
+### Prompt
+
+"Vale, seguimos ahora con el siguiente paso?" (paso 3, imágenes)
+
+### Qué me dio
+
+Añadió a `src/index.js` el código del enunciado para importar `./assets/coffee.jpg` y meter la foto en la página, y me dijo qué tenía que comprobar en Network y en `dist/`.
+
+### Qué corregí y por qué
+
+La foto la elegí y descargué yo, y pesaba unos 2 MB, más que los "varios cientos de KB" del enunciado. Además, con el tamaño original no cabía en pantalla y no podía hacer la captura del paso 6, así que pedí limitar su ancho con una regla en `main.scss`. Al ver el build también me fijé en que no todo lo pequeño se incrusta: el favicon SVG sale como fichero aparte en `dist/assets` aunque pese menos de 4 KiB.
