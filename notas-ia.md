@@ -61,3 +61,19 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** desglosó las comprobaciones del paso 1 en `enunciado-paso-a-paso.md` (qué mirar en `dist/`, `preview` en el 4173, `start` en el 5173, el 304, el `?t=` y `new Date(...)`). Además detectó dos fallos en mi `index.html`: faltaba la cabecera con el nombre de la tienda y había un acento grave (`) suelto dentro del `<head>`.
 
 **Qué corregí y por qué:** nada de lo que me dio; apliqué los dos arreglos que me señaló (añadir la cabecera `<header><h1>Tueste</h1></header>` y borrar el acento grave suelto).
+
+### [Repo] Subir el repositorio a GitHub
+
+**Prompt:** "He creado un repositorio en GitHub para este repositorio local. Las instrucciones son estas: `git remote add origin ...`, `git branch -M main`, `git push -u origin main`. ¿Podrías hacerlo?"
+
+**Qué me dio:** ejecutó los tres comandos: añadió el remoto `origin`, dejó la rama como `main` y subió los dos commits existentes, con `main` siguiendo a `origin/main`. Me avisó de que los cambios sin commitear (`index.html` y `src/assets/`) no se subieron.
+
+**Qué corregí y por qué:** nada.
+
+### [Paso 3] Importar la foto desde JS
+
+**Prompt:** "Vale, seguimos ahora con el siguiente paso?"
+
+**Qué me dio:** vio que el logo ya estaba en la cabecera y añadió a `src/index.js` el código del enunciado para importar `./assets/coffee.jpg`, mostrarla con `console.log` y meterla en el `body`. La foto la tengo que descargar yo.
+
+**Qué corregí y por qué:** nada por ahora.

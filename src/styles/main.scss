@@ -1,4 +1,5 @@
 @use "variables" as *;
+@use "reset";
 
 .brand-header {
   display: flex;
@@ -9,7 +10,10 @@
   color: #fff;
 
   h1 {
-    margin: 0;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: $tueste-500;
   }
 }
