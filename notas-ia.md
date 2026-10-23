@@ -93,3 +93,11 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** montó React con el código del enunciado (`data.ts`, `app.tsx`, `index.tsx`, `jsx` y `verbatimModuleSyntax` en `tsconfig.json`, `#root` en el HTML), revisó mi captura de `Cache-Control`, instaló `@vitejs/plugin-react`, lo añadió a `vite.config.ts` y redactó las dos respuestas del README.
 
 **Qué corregí y por qué:** nada por ahora.
+
+### [Extra] Favicon con el logo
+
+**Prompt:** "Sí, usa mi logo como favicon dándole otro color"
+
+**Qué me dio:** creó `src/assets/favicon.svg`, una copia de mi logo con el trazo en el marrón de la marca (`#9a5b33`, el de `$tueste-500`) en lugar de blanco para que se vea en pestañas claras, y lo enlazó con `<link rel="icon">` en `index.html`. Así desaparece el 404 de `/favicon.ico` que salía en consola.
+
+**Qué corregí y por qué:** nada.

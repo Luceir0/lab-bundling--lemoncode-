@@ -55,3 +55,19 @@ Mi código cambia continuamente, así que Vite lo sirve fichero a fichero desde 
 **¿Qué aporta exactamente `@vitejs/plugin-react` si el JSX ya funcionaba sin él?**
 
 Sin el plugin, Vite ya transforma el JSX (oxc lo convierte en llamadas a `jsx()`), pero al guardar `app.tsx` no sabe actualizar sólo ese componente y recarga la página entera: el carrito volvía a 0. El plugin añade **Fast Refresh**: sustituye el componente modificado conservando su estado, así que al cambiar el `<h2>` el título se actualiza y el carrito mantiene sus 3 bolsas.
+
+### 6 · Variables de entorno
+
+![La página en preview con los valores de producción](docs/06-preview-produccion.png)
+
+**¿Por qué Vite obliga a usar el prefijo `VITE_`?**
+
+Porque todo lo que se lee con `import.meta.env` acaba escrito tal cual dentro del JavaScript que descarga el navegador. Un `.env` puede tener también variables que no deberían salir nunca del servidor o de la máquina de desarrollo (contraseñas, claves…), así que Vite sólo expone las que llevan el prefijo: es una forma de decir explícitamente "esta es pública". Lo comprobé: con `SHOP_NAME` la variable no aparecía en `import.meta.env`, y con `VITE_SHOP_NAME` sí.
+
+**Si mañana cambia la URL de la API de producción, ¿basta con editar `.env.production` en el servidor? ¿Por qué nunca debe ir una clave secreta en una variable `VITE_`?**
+
+No basta: las variables se leen **al hacer el build** y se sustituyen por su valor en el código (en `dist/assets/index-<hash>.js` aparece `api.tueste.example` escrito tal cual). Después el `.env.production` ya no se usa, así que hay que cambiarlo y volver a ejecutar `npm run build` y desplegar el nuevo `dist/`. Por la misma razón nunca debe ir un secreto en una variable `VITE_`: quedaría en un fichero público que cualquiera puede abrir desde las DevTools. Los secretos tienen que quedarse en un servidor propio, que es quien llama a la API que los necesita.
+
+**¿Un *feature flag* desactivado sirve para "esconder" algo a los usuarios?**
+
+No es una forma fiable de esconder nada. En mi caso concreto `Envío gratis` **no** aparece en el bundle de producción: Vite sustituye `import.meta.env.VITE_SHOW_OFFERS` por `"false"`, la comparación `"false" === "true"` se resuelve al construir y el minificador elimina el banner como código muerto. Pero eso depende de cómo esté escrito el código: si el flag llegara en tiempo de ejecución (de una API, de `localStorage`…) o la comprobación fuera menos directa, el texto y la lógica irían en el JS y cualquiera podría leerlos o activarlos. Un flag sirve para decidir qué se muestra, no para proteger información: lo que no deba ver el usuario no debe llegar al navegador.
