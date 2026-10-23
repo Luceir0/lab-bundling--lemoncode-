@@ -77,3 +77,11 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** vio que el logo ya estaba en la cabecera y añadió a `src/index.js` el código del enunciado para importar `./assets/coffee.jpg`, mostrarla con `console.log` y meterla en el `body`. La foto la tengo que descargar yo.
 
 **Qué corregí y por qué:** nada por ahora.
+
+### [Paso 4] Modo estricto y vite-plugin-checker
+
+**Prompt:** "Incluye el modo estricto en tsconfig y montemos vite-plugin-checker"
+
+**Qué me dio:** añadió `"strict": true` al `tsconfig.json` (el del enunciado no lo traía aunque luego habla del modo estricto), instaló `vite-plugin-checker` y creó `vite.config.ts` con `checker({ typescript: true })`. Comprobó que, con `const total: string = 3;` puesto, `npm run build` falla con `TS2322`.
+
+**Qué corregí y por qué:** nada por ahora.
