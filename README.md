@@ -43,3 +43,15 @@ El logo no aparece en `dist/assets`: Vite lo ha metido dentro del propio `dist/i
 **¿Por qué Vite, por sí solo, no comprueba los tipos? ¿Qué gana con ello?**
 
 Vite no usa el compilador de TypeScript para servir los `.ts`: usa **oxc**, que se limita a *quitar* las anotaciones de tipo fichero a fichero, sin mirar los demás, y devuelve JavaScript. Comprobar los tipos exige analizar el proyecto entero a la vez (qué exporta cada módulo, qué tipos tienen las librerías…), y eso es muy lento comparado con transpilar un único fichero cada vez que lo pides o lo guardas. Para que transpilar fichero a fichero sea seguro está la opción `isolatedModules`, que hace que TypeScript avise de lo que no se puede traducir sin conocer otros ficheros (por ejemplo, reexportar un tipo sin `export type`). Así Vite arranca y recarga casi al instante, y la comprobación de tipos se deja al editor, a `tsc` o, como aquí, a `vite-plugin-checker`, que la ejecuta en otro proceso sin frenar el servidor y además hace fallar el `build` si hay errores (con `const total: string = 3;` daba `TS2322` y el build terminaba con error).
+
+### 5 · React
+
+![Cache-Control de las dependencias pre-empaquetadas](docs/05-cache-control.png)
+
+**¿Por qué Vite trata distinto a `react` (dependencia) y a `app.tsx` (tu código)? ¿Qué es el pre-bundling y qué problema resuelve?**
+
+Mi código cambia continuamente, así que Vite lo sirve fichero a fichero desde `src/` y deja que el navegador pregunte cada vez si ha cambiado (`app.tsx` responde `304`). Las dependencias de `node_modules` casi nunca cambian, pero vienen en formatos y tamaños poco prácticos: React se publica en CommonJS, que el navegador no entiende como módulo, y otras librerías están partidas en cientos de ficheros que serían cientos de peticiones. El **pre-bundling** consiste en que, al arrancar, Vite empaqueta cada dependencia una sola vez en un único módulo ESM y lo guarda en `node_modules/.vite/deps/` (`react.js`, `react-dom_client.js`). Como el `?v=<hash>` cambia si cambian las versiones instaladas, puede servirlos con `Cache-Control: max-age=31536000, immutable`: tras el primer F5 salen de la caché del navegador sin preguntar siquiera al servidor.
+
+**¿Qué aporta exactamente `@vitejs/plugin-react` si el JSX ya funcionaba sin él?**
+
+Sin el plugin, Vite ya transforma el JSX (oxc lo convierte en llamadas a `jsx()`), pero al guardar `app.tsx` no sabe actualizar sólo ese componente y recarga la página entera: el carrito volvía a 0. El plugin añade **Fast Refresh**: sustituye el componente modificado conservando su estado, así que al cambiar el `<h2>` el título se actualiza y el carrito mantiene sus 3 bolsas.

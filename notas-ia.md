@@ -85,3 +85,11 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** añadió `"strict": true` al `tsconfig.json` (el del enunciado no lo traía aunque luego habla del modo estricto), instaló `vite-plugin-checker` y creó `vite.config.ts` con `checker({ typescript: true })`. Comprobó que, con `const total: string = 3;` puesto, `npm run build` falla con `TS2322`.
 
 **Qué corregí y por qué:** nada por ahora.
+
+### [Paso 5] React y plugin de React
+
+**Prompt:** "Listo. ¿Puedes comprobar que en este paso está hecho todo lo necesario para cumplir con los requisitos? Si es así, pasemos al punto siguiente."
+
+**Qué me dio:** montó React con el código del enunciado (`data.ts`, `app.tsx`, `index.tsx`, `jsx` y `verbatimModuleSyntax` en `tsconfig.json`, `#root` en el HTML), revisó mi captura de `Cache-Control`, instaló `@vitejs/plugin-react`, lo añadió a `vite.config.ts` y redactó las dos respuestas del README.
+
+**Qué corregí y por qué:** nada por ahora.
