@@ -78,6 +78,16 @@ No es una forma fiable de esconder nada. En mi caso concreto `Envío gratis` **n
 
 No las mete todas: el plugin `@tailwindcss/vite` lee los ficheros del proyecto como texto y busca cadenas que tengan forma de clase suya, y sólo genera CSS para las que encuentra. No ejecuta el código ni mira si la clase se usa de verdad en un `className`: basta con que aparezca escrita. Lo comprobé en `dist/assets/index-<hash>.css`: están `grid-cols-3` y `bg-amber-700`, que uso en el catálogo, y no está una clase de color que no uso. Pero la primera vez sí estaba, porque Tailwind v4 lee todos los ficheros que no están en `.gitignore`, y el `ENUNCIADO.md` la nombra como ejemplo. Lo arreglé con `@import "tailwindcss" source(".");` en `src/styles.css`, para que sólo lea `src/`. Por la misma razón, los nombres de clase no se pueden construir concatenando trozos (`"bg-" + color`): la cadena completa tiene que estar escrita en algún sitio para que la encuentre. Las reglas de `.brand-header` de Sass acaban en el mismo fichero CSS, porque Vite junta todo el CSS importado desde `index.tsx`.
 
+### Opcional 2 · Code splitting y análisis del bundle
+
+**Si cambias uno de los dos a un `import` normal al principio de `app.tsx`, ¿qué pasa con su chunk? ¿Por qué?**
+
+Cambié `shipping` a `import { shippingCost } from "./shipping";` y, al construir, `shipping-<hash>.js` desapareció: su código pasó a ir dentro de `index-<hash>.js`, mientras que `cart-<hash>.js` seguía saliendo aparte. Un `import` estático le dice a Vite que el módulo hace falta desde el principio para que `app.tsx` funcione, así que lo mete en el chunk principal y se descarga siempre al cargar la página. Sólo con `import()` dinámico sabe que puede esperar hasta que se ejecute esa línea y lo saca a un fichero aparte. El `index` no creció (pasó de 222.47 kB a 222.37 kB) porque `shippingCost` es una sola línea y, al quitar el `import()`, también desaparece el código que carga el chunk bajo demanda: con un módulo tan pequeño, separarlo no compensa. Después lo dejé como estaba.
+
+**En un proyecto real, ¿qué partes de una tienda cargarías así?**
+
+Lo que no hace falta para ver el catálogo y que sólo usan algunos usuarios o en algún momento concreto: el proceso de pago (formularios, validaciones y la librería de la pasarela), el carrito completo, el área de cuenta del usuario, el panel de administración, un editor de reseñas, un mapa de tiendas o un visor de imágenes con zoom. También cada página o ruta, para que quien entra en la portada no descargue el código del resto de la tienda.
+
 ## Salida final de `npm run build`
 
 ```text
@@ -110,7 +120,7 @@ dist/assets/index-DSifi2Nh.js       220.23 kB │ gzip: 68.96 kB
 **Opcionales**
 
 - [x] Opcional 1 · Tailwind
-- [ ] Opcional 2 · Code splitting y análisis del bundle
+- [x] Opcional 2 · Code splitting y análisis del bundle
 
 **Extras**
 

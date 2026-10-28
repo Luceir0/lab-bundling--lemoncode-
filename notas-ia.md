@@ -133,3 +133,43 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** explicó que no es un error real sino del comprobador de CSS de VS Code (`css-semicolonexpected`), que no conoce la sintaxis de Tailwind v4; el build funciona. Como la extensión Tailwind CSS IntelliSense ya estaba instalada, creó `.vscode/settings.json` con `"files.associations": { "*.css": "tailwindcss" }` (no se sube: `.vscode/*` está en `.gitignore`).
 
 **Qué corregí y por qué:** nada por ahora.
+
+### [Opcional 2] Entender el botón "Calcular total"
+
+**Prompt:** "No entiendo el punto 3 de app.tsx"
+
+**Qué me dio:** una explicación por partes de lo que hay que añadir en `app.tsx` (el estado `message`, la función `async` con `await import()` y el botón con su `<p>`), dónde va cada trozo dentro de mi componente y por qué `import()` dentro de la función hace que Vite saque `cart` y `shipping` a chunks aparte.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Opcional 2] Comprobar los chunks de cart y shipping
+
+**Prompt:** "Hecho. Cómo podemos continuar?"
+
+**Qué me dio:** ejecutó el build y confirmó que salen `cart-<hash>.js` (0.06 kB) y `shipping-<hash>.js` (0.04 kB) aparte de `index-<hash>.js`; comprobó también que `bg-olive-800`, que puse yo en el botón "Añadir", existe en Tailwind 4.3 y está en el CSS. Me explicó qué mirar en Network con `preview` y cómo hacer la prueba de la pregunta 1.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Opcional 2] Parte B: analizador y loglevel
+
+**Prompt:** "hecho, sigamos"
+
+**Qué me dio:** los pasos de la parte B: instalar `vite-bundle-analyzer` (en `devDependencies`) y `loglevel` (en `dependencies`, porque va en el código que llega al navegador), añadir `analyzer(...)` en modo estático a `vite.config.ts` y usar `log.warn(...)` en `cart.ts` y `shipping.ts`.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Opcional 2] Revisión de la parte B
+
+**Prompt:** "hecho. Podrías comprobar qué tal está implementada la solución?"
+
+**Qué me dio:** revisó `vite.config.ts`, `cart.ts`, `shipping.ts` y `package.json` (analizador en `devDependencies`, `loglevel` en `dependencies`) y ejecutó el build: sale `loglevel-<hash>.js` (3.23 kB) aparte, `dist/bundle-report.html` y los `.map`. Abrió `cart-<hash>.js` y `shipping-<hash>.js` para enseñarme que los dos importan el mismo `loglevel-<hash>.js` en lugar de llevar una copia.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Opcional 2] Revisión de la captura del analizador
+
+**Prompt:** "hecho, podrías comprobarlo?"
+
+**Qué me dio:** revisó `docs/opcional2-analyzer.png` y sacó las cifras de los datos de `dist/bundle-report.html`: dentro de `index-<hash>.js` (216.5 kB), `react-dom-client.production.js` ocupa 198 kB (~91 %) y mi `app.tsx` 1.2 kB. Me sugirió repetir la captura haciendo zoom en el chunk principal (o quitando la foto desde el menú ☰), porque la foto de 2 MB tapa casi todo y la pregunta es sobre el chunk principal.
+
+**Qué corregí y por qué:** nada por ahora.

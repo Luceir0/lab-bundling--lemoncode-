@@ -5,6 +5,16 @@ import coffeePhoto from "./assets/coffee.jpg";
 
 export const App = () => {
   const [cart, setCart] = useState<Coffee[]>([]);
+  const [message, setMessage] = useState("");
+
+  const calculateTotal = async () => {
+    const { cartTotal } = await import("./cart");
+    const { shippingCost } = await import("./shipping");
+    const total = cartTotal(cart);
+    setMessage(
+      `Total: ${total.toFixed(2)} € + envío ${shippingCost(total).toFixed(2)} €`,
+    );
+  };
 
   return (
     <main>
@@ -14,11 +24,14 @@ export const App = () => {
       <img src={coffeePhoto} alt="" />
       <ul className="grid gap-4 sm:grid-cols-3">
         {coffees.map((coffee) => (
-          <li key={coffee.id} className="rounded-lg border border-stone-200 p-4 shadow-md">
+          <li
+            key={coffee.id}
+            className="rounded-lg border border-stone-200 p-4 shadow-md"
+          >
             <h3 className="font-semibold">{coffee.name}</h3>
             <p className="text-stone-600">{coffee.price.toFixed(2)} €</p>
             <button
-              className="mt-3 rounded bg-amber-700 px-3 py-1 text-white hover:bg-amber-800"
+              className="mt-3 rounded bg-olive-800 px-3 py-1 text-white hover:bg-amber-800"
               onClick={() => setCart((prev) => [...prev, coffee])}
             >
               Añadir
@@ -27,6 +40,13 @@ export const App = () => {
         ))}
       </ul>
       <p>Bolsas en el carrito: {cart.length}</p>
+      <button
+        className="mt-3 rounded bg-amber-900 px-3 py-1 text-white hover:bg-amber-800"
+        onClick={calculateTotal}
+      >
+        Calcular total
+      </button>
+      <p>{message}</p>
       <small>API: {API_BASE}</small>
     </main>
   );
