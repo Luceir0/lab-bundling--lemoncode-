@@ -101,3 +101,35 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** creó `src/assets/favicon.svg`, una copia de mi logo con el trazo en el marrón de la marca (`#9a5b33`, el de `$tueste-500`) en lugar de blanco para que se vea en pestañas claras, y lo enlazó con `<link rel="icon">` en `index.html`. Así desaparece el 404 de `/favicon.ico` que salía en consola.
 
 **Qué corregí y por qué:** nada.
+
+### [Opcional 1] Tailwind y el reset de Sass
+
+**Prompt:** "Sí, hagamos los opcionales. Empecemos por el 1. Voy a hacer el punto 1 y el 2, podemos seguir desde ahí?"
+
+**Qué me dio:** revisó lo que yo había hecho (instalación, `styles.css` e import en `index.tsx` antes de `main.scss`) y vio que faltaba `tailwindcss()` en `vite.config.ts`. Me dijo que, como Tailwind se carga antes que `main.scss`, donde chocaran mandaría mi Sass "por orden".
+
+**Qué corregí y por qué:** la explicación era incorrecta y la propia IA la rectificó al mirar el reset: no es cuestión de orden sino de capas. Tailwind v4 mete sus clases en `@layer utilities`, y cualquier regla **fuera** de una capa (como todo mi `_reset.scss`) gana a cualquier regla dentro de una capa, se cargue antes o después. Así, `* { padding: 0 }` o `button { background: none }` del reset anularían `p-4` o `bg-amber-700`. Solución: meter el reset en `@layer base`.
+
+### [Opcional 1] Catálogo con Tailwind y comprobación en dist
+
+**Prompt:** "Vale, puedes hacer ambas cosas?"
+
+**Qué me dio:** metió el reset en `@layer base` con `meta.load-css("reset")` en `main.scss` y puso las clases de Tailwind en el catálogo de `app.tsx` (rejilla `grid sm:grid-cols-3 gap-4`, borde, sombra, botón ámbar). Al revisar el CSS de `dist` vio que `bg-pink-500` **sí** salía: Tailwind v4 lee todos los ficheros del proyecto que no estén en `.gitignore`, y `ENUNCIADO.md` la nombra como ejemplo. Lo arregló con `@import "tailwindcss" source(".");` en `src/styles.css`, para que sólo lea `src/`.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Opcional 1] Respuesta del README
+
+**Prompt:** "Vale, puedes darme la respuesta para el readme?"
+
+**Qué me dio:** un borrador de la respuesta a "¿cómo sabe Tailwind qué clases meter en el CSS final?", basado en lo que vimos en `dist` (incluido lo de `ENUNCIADO.md` y `source(".")`) y sin escribir nombres de clases que no uso.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Opcional 1] Error de VS Code con `source(".")`
+
+**Prompt:** "Por qué esto me da error en styles.css ?: `@import "tailwindcss" source(".");`" y luego "Vale, hagamos eso"
+
+**Qué me dio:** explicó que no es un error real sino del comprobador de CSS de VS Code (`css-semicolonexpected`), que no conoce la sintaxis de Tailwind v4; el build funciona. Como la extensión Tailwind CSS IntelliSense ya estaba instalada, creó `.vscode/settings.json` con `"files.associations": { "*.css": "tailwindcss" }` (no se sube: `.vscode/*` está en `.gitignore`).
+
+**Qué corregí y por qué:** nada por ahora.

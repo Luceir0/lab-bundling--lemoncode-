@@ -6,11 +6,11 @@
 npm install
 ```
 
-| Script | Comando | Para qué sirve |
-|---|---|---|
-| `start` | `npm start` | Arranca el servidor de desarrollo de Vite en <http://localhost:5173>. Sirve `src/` sin empaquetar, comprueba los tipos y recarga al guardar. |
-| `build` | `npm run build` | Genera la versión de producción en `dist/` (minificada y con hash en los nombres). Falla si hay errores de tipos. |
-| `preview` | `npm run preview` | Sirve la carpeta `dist/` en <http://localhost:4173> para probar la versión de producción. |
+| Script    | Comando           | Para qué sirve                                                                                                                               |
+| --------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `start`   | `npm start`       | Arranca el servidor de desarrollo de Vite en <http://localhost:5173>. Sirve `src/` sin empaquetar, comprueba los tipos y recarga al guardar. |
+| `build`   | `npm run build`   | Genera la versión de producción en `dist/` (minificada y con hash en los nombres). Falla si hay errores de tipos.                            |
+| `preview` | `npm run preview` | Sirve la carpeta `dist/` en <http://localhost:4173> para probar la versión de producción.                                                    |
 
 ## Respuestas
 
@@ -36,13 +36,13 @@ En desarrollo, Vite compila el `.scss` y lo envuelve en un módulo JS (`Content-
 
 **¿Dónde ha ido a parar el logo y por qué Vite lo trata distinto que la foto? ¿Qué ganamos y qué perdemos con eso?**
 
-El logo no aparece en `dist/assets`: Vite lo ha metido dentro del propio `dist/index.html`, en el `src` del `<img>`, como *data URI* (`data:image/svg+xml,%3csvg...`). Lo decide la opción `build.assetsInlineLimit`, que por defecto vale 4 KiB (4096 bytes): los ficheros por debajo de ese tamaño se incrustan y los que lo superan se copian a `dist/assets` con hash. El logo pesa unos 340 bytes, así que se incrusta; la foto pesa unos 2 MB, así que va a `dist/assets/coffee-<hash>.jpg` y el `import` devuelve su URL. Lo que ganamos es una petición HTTP menos para un fichero diminuto, que llega junto al HTML sin esperar a nada más. Lo que perdemos es que ya no se cachea por separado: va dentro del HTML (o del JS/CSS), que pesa más y se vuelve a descargar entero cada vez que cambia, y si la imagen se usara en varios sitios se repetiría en cada uno. Por eso sólo compensa con ficheros muy pequeños.
+El logo no aparece en `dist/assets`: Vite lo ha metido dentro del propio `dist/index.html`, en el `src` del `<img>`, como _data URI_ (`data:image/svg+xml,%3csvg...`). Lo decide la opción `build.assetsInlineLimit`, que por defecto vale 4 KiB (4096 bytes): los ficheros por debajo de ese tamaño se incrustan y los que lo superan se copian a `dist/assets` con hash. El logo pesa unos 340 bytes, así que se incrusta; la foto pesa unos 2 MB, así que va a `dist/assets/coffee-<hash>.jpg` y el `import` devuelve su URL. Lo que ganamos es una petición HTTP menos para un fichero diminuto, que llega junto al HTML sin esperar a nada más. Lo que perdemos es que ya no se cachea por separado: va dentro del HTML (o del JS/CSS), que pesa más y se vuelve a descargar entero cada vez que cambia, y si la imagen se usara en varios sitios se repetiría en cada uno. Por eso sólo compensa con ficheros muy pequeños.
 
 ### 4 · TypeScript con comprobación de tipos
 
 **¿Por qué Vite, por sí solo, no comprueba los tipos? ¿Qué gana con ello?**
 
-Vite no usa el compilador de TypeScript para servir los `.ts`: usa **oxc**, que se limita a *quitar* las anotaciones de tipo fichero a fichero, sin mirar los demás, y devuelve JavaScript. Comprobar los tipos exige analizar el proyecto entero a la vez (qué exporta cada módulo, qué tipos tienen las librerías…), y eso es muy lento comparado con transpilar un único fichero cada vez que lo pides o lo guardas. Para que transpilar fichero a fichero sea seguro está la opción `isolatedModules`, que hace que TypeScript avise de lo que no se puede traducir sin conocer otros ficheros (por ejemplo, reexportar un tipo sin `export type`). Así Vite arranca y recarga casi al instante, y la comprobación de tipos se deja al editor, a `tsc` o, como aquí, a `vite-plugin-checker`, que la ejecuta en otro proceso sin frenar el servidor y además hace fallar el `build` si hay errores (con `const total: string = 3;` daba `TS2322` y el build terminaba con error).
+Vite no usa el compilador de TypeScript para servir los `.ts`: usa **oxc**, que se limita a _quitar_ las anotaciones de tipo fichero a fichero, sin mirar los demás, y devuelve JavaScript. Comprobar los tipos exige analizar el proyecto entero a la vez (qué exporta cada módulo, qué tipos tienen las librerías…), y eso es muy lento comparado con transpilar un único fichero cada vez que lo pides o lo guardas. Para que transpilar fichero a fichero sea seguro está la opción `isolatedModules`, que hace que TypeScript avise de lo que no se puede traducir sin conocer otros ficheros (por ejemplo, reexportar un tipo sin `export type`). Así Vite arranca y recarga casi al instante, y la comprobación de tipos se deja al editor, a `tsc` o, como aquí, a `vite-plugin-checker`, que la ejecuta en otro proceso sin frenar el servidor y además hace fallar el `build` si hay errores (con `const total: string = 3;` daba `TS2322` y el build terminaba con error).
 
 ### 5 · React
 
@@ -68,9 +68,15 @@ Porque todo lo que se lee con `import.meta.env` acaba escrito tal cual dentro de
 
 No basta: las variables se leen **al hacer el build** y se sustituyen por su valor en el código (en `dist/assets/index-<hash>.js` aparece `api.tueste.example` escrito tal cual). Después el `.env.production` ya no se usa, así que hay que cambiarlo y volver a ejecutar `npm run build` y desplegar el nuevo `dist/`. Por la misma razón nunca debe ir un secreto en una variable `VITE_`: quedaría en un fichero público que cualquiera puede abrir desde las DevTools. Los secretos tienen que quedarse en un servidor propio, que es quien llama a la API que los necesita.
 
-**¿Un *feature flag* desactivado sirve para "esconder" algo a los usuarios?**
+**¿Un _feature flag_ desactivado sirve para "esconder" algo a los usuarios?**
 
 No es una forma fiable de esconder nada. En mi caso concreto `Envío gratis` **no** aparece en el bundle de producción: Vite sustituye `import.meta.env.VITE_SHOW_OFFERS` por `"false"`, la comparación `"false" === "true"` se resuelve al construir y el minificador elimina el banner como código muerto. Pero eso depende de cómo esté escrito el código: si el flag llegara en tiempo de ejecución (de una API, de `localStorage`…) o la comprobación fuera menos directa, el texto y la lógica irían en el JS y cualquiera podría leerlos o activarlos. Un flag sirve para decidir qué se muestra, no para proteger información: lo que no deba ver el usuario no debe llegar al navegador.
+
+### Opcional 1 · Tailwind
+
+**Tailwind tiene miles de clases. ¿Cómo sabe cuáles meter en el CSS final?**
+
+No las mete todas: el plugin `@tailwindcss/vite` lee los ficheros del proyecto como texto y busca cadenas que tengan forma de clase suya, y sólo genera CSS para las que encuentra. No ejecuta el código ni mira si la clase se usa de verdad en un `className`: basta con que aparezca escrita. Lo comprobé en `dist/assets/index-<hash>.css`: están `grid-cols-3` y `bg-amber-700`, que uso en el catálogo, y no está una clase de color que no uso. Pero la primera vez sí estaba, porque Tailwind v4 lee todos los ficheros que no están en `.gitignore`, y el `ENUNCIADO.md` la nombra como ejemplo. Lo arreglé con `@import "tailwindcss" source(".");` en `src/styles.css`, para que sólo lea `src/`. Por la misma razón, los nombres de clase no se pueden construir concatenando trozos (`"bg-" + color`): la cadena completa tiene que estar escrita en algún sitio para que la encuentre. Las reglas de `.brand-header` de Sass acaban en el mismo fichero CSS, porque Vite junta todo el CSS importado desde `index.tsx`.
 
 ## Salida final de `npm run build`
 
@@ -103,7 +109,7 @@ dist/assets/index-DSifi2Nh.js       220.23 kB │ gzip: 68.96 kB
 
 **Opcionales**
 
-- [ ] Opcional 1 · Tailwind
+- [x] Opcional 1 · Tailwind
 - [ ] Opcional 2 · Code splitting y análisis del bundle
 
 **Extras**
