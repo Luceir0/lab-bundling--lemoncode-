@@ -24,7 +24,7 @@ El hash se calcula a partir del contenido del fichero: si el código cambia, cam
 
 **¿Qué diferencia hay entre `npm start` y `npm run preview`? ¿Cuál usarías para comprobar que la versión de producción funciona?**
 
-`npm start` es el servidor de desarrollo: sirve los ficheros de `src/` tal cual, sin empaquetar ni minificar, y los recarga al guardar (por eso aparecen `client`, `env.mjs` y el `?t=<timestamp>`). `npm run preview` no compila nada: sirve lo que ya hay en `dist/`, que es exactamente lo que se subiría a producción. Para comprobar que la versión de producción funciona usaría `npm run build` + `npm run preview`.
+`npm start` es el servidor de desarrollo: sirve los ficheros de `src/` tal cual, sin empaquetar ni minificar, y los recarga al guardar. `npm run preview` no compila nada: sirve lo que ya hay en `dist/`, que es exactamente lo que se subiría a producción. Para comprobar que la versión de producción funciona usaría `npm run build` + `npm run preview`.
 
 ### 2 · Estilos con Sass
 
@@ -36,7 +36,7 @@ En desarrollo, Vite compila el `.scss` y lo envuelve en un módulo JS (`Content-
 
 **¿Dónde ha ido a parar el logo y por qué Vite lo trata distinto que la foto? ¿Qué ganamos y qué perdemos con eso?**
 
-El logo no aparece en `dist/assets`: Vite lo ha metido dentro del propio `dist/index.html`, en el `src` del `<img>`, como _data URI_ (`data:image/svg+xml,%3csvg...`). Lo decide la opción `build.assetsInlineLimit`, que por defecto vale 4 KiB (4096 bytes): los ficheros por debajo de ese tamaño se incrustan y los que lo superan se copian a `dist/assets` con hash. El logo pesa unos 340 bytes, así que se incrusta; la foto pesa unos 2 MB, así que va a `dist/assets/coffee-<hash>.jpg` y el `import` devuelve su URL. Lo que ganamos es una petición HTTP menos para un fichero diminuto, que llega junto al HTML sin esperar a nada más. Lo que perdemos es que ya no se cachea por separado: va dentro del HTML (o del JS/CSS), que pesa más y se vuelve a descargar entero cada vez que cambia, y si la imagen se usara en varios sitios se repetiría en cada uno. Por eso sólo compensa con ficheros muy pequeños.
+El logo no aparece en `dist/assets`: Vite lo ha metido dentro del propio `dist/index.html`, en el `src` del `<img>`, como _data URI_ (`data:image/svg+xml,%3csvg...`). Lo decide la opción `build.assetsInlineLimit`, que por defecto vale 4 KiB: los ficheros por debajo de ese tamaño se incrustan y los que lo superan se copian a `dist/assets` con hash. El logo pesa unos 340 bytes, así que se incrusta; la foto pesa unos 2 MB, así que va a `dist/assets/coffee-<hash>.jpg` y el `import` devuelve su URL. Lo que ganamos es una petición HTTP menos para un fichero diminuto, que llega junto al HTML sin esperar a nada más. Lo que perdemos es que ya no se cachea por separado: va dentro del HTML (o del JS/CSS), que pesa más y se vuelve a descargar entero cada vez que cambia, y si la imagen se usara en varios sitios se repetiría en cada uno. Por eso sólo compensa con ficheros muy pequeños.
 
 ### 4 · TypeScript con comprobación de tipos
 
@@ -62,21 +62,21 @@ Sin el plugin, Vite ya transforma el JSX (oxc lo convierte en llamadas a `jsx()`
 
 **¿Por qué Vite obliga a usar el prefijo `VITE_`?**
 
-Porque todo lo que se lee con `import.meta.env` acaba escrito tal cual dentro del JavaScript que descarga el navegador. Un `.env` puede tener también variables que no deberían salir nunca del servidor o de la máquina de desarrollo (contraseñas, claves…), así que Vite sólo expone las que llevan el prefijo: es una forma de decir explícitamente "esta es pública". Lo comprobé: con `SHOP_NAME` la variable no aparecía en `import.meta.env`, y con `VITE_SHOP_NAME` sí.
+Porque todo lo que se lee con `import.meta.env` acaba escrito tal cual dentro del JavaScript que descarga el navegador. Vite sólo expone las que llevan el prefijo: es una forma de decir "esta es pública". Lo comprobé: con `SHOP_NAME` la variable no aparecía en `import.meta.env`, y con `VITE_SHOP_NAME` sí.
 
 **Si mañana cambia la URL de la API de producción, ¿basta con editar `.env.production` en el servidor? ¿Por qué nunca debe ir una clave secreta en una variable `VITE_`?**
 
-No basta: las variables se leen **al hacer el build** y se sustituyen por su valor en el código (en `dist/assets/index-<hash>.js` aparece `api.tueste.example` escrito tal cual). Después el `.env.production` ya no se usa, así que hay que cambiarlo y volver a ejecutar `npm run build` y desplegar el nuevo `dist/`. Por la misma razón nunca debe ir un secreto en una variable `VITE_`: quedaría en un fichero público que cualquiera puede abrir desde las DevTools. Los secretos tienen que quedarse en un servidor propio, que es quien llama a la API que los necesita.
+No. Las variables se leen **al hacer el build** y se sustituyen por su valor en el código (en `dist/assets/index-<hash>.js` aparece `api.tueste.example` escrito tal cual). Después el `.env.production` ya no se usa, así que hay que cambiarlo y volver a ejecutar `npm run build` y desplegar el nuevo `dist/`. Por la misma razón nunca debe ir un secreto en una variable `VITE_`: quedaría en un fichero público que cualquiera puede abrir desde las DevTools. Los secretos tienen que quedarse en un servidor propio, que es quien llama a la API que los necesita.
 
 **¿Un _feature flag_ desactivado sirve para "esconder" algo a los usuarios?**
 
-No es una forma fiable de esconder nada. En mi caso concreto `Envío gratis` **no** aparece en el bundle de producción: Vite sustituye `import.meta.env.VITE_SHOW_OFFERS` por `"false"`, la comparación `"false" === "true"` se resuelve al construir y el minificador elimina el banner como código muerto. Pero eso depende de cómo esté escrito el código: si el flag llegara en tiempo de ejecución (de una API, de `localStorage`…) o la comprobación fuera menos directa, el texto y la lógica irían en el JS y cualquiera podría leerlos o activarlos. Un flag sirve para decidir qué se muestra, no para proteger información: lo que no deba ver el usuario no debe llegar al navegador.
+No. En mi caso concreto `Envío gratis` **no** aparece en el bundle de producción: Vite sustituye `import.meta.env.VITE_SHOW_OFFERS` por `"false"`, la comparación `"false" === "true"` se resuelve al construir y el minificador elimina el banner como código muerto. Pero eso depende de cómo esté escrito el código: si el flag llegara en tiempo de ejecución (de una API, de `localStorage`…) o la comprobación fuera menos directa, el texto y la lógica irían en el JS y cualquiera podría leerlos o activarlos. Un flag sirve para decidir qué se muestra, no para proteger información: lo que no deba ver el usuario no debe llegar al navegador.
 
 ### Opcional 1 · Tailwind
 
 **Tailwind tiene miles de clases. ¿Cómo sabe cuáles meter en el CSS final?**
 
-No las mete todas: el plugin `@tailwindcss/vite` lee los ficheros del proyecto como texto y busca cadenas que tengan forma de clase suya, y sólo genera CSS para las que encuentra. No ejecuta el código ni mira si la clase se usa de verdad en un `className`: basta con que aparezca escrita. Lo comprobé en `dist/assets/index-<hash>.css`: están `grid-cols-3` y `bg-amber-700`, que uso en el catálogo, y no está una clase de color que no uso. Pero la primera vez sí estaba, porque Tailwind v4 lee todos los ficheros que no están en `.gitignore`, y el `ENUNCIADO.md` la nombra como ejemplo. Lo arreglé con `@import "tailwindcss" source(".");` en `src/styles.css`, para que sólo lea `src/`. Por la misma razón, los nombres de clase no se pueden construir concatenando trozos (`"bg-" + color`): la cadena completa tiene que estar escrita en algún sitio para que la encuentre. Las reglas de `.brand-header` de Sass acaban en el mismo fichero CSS, porque Vite junta todo el CSS importado desde `index.tsx`.
+No las mete todas: el plugin `@tailwindcss/vite` lee los ficheros del proyecto como texto y busca cadenas que tengan forma de clase suya, y sólo genera CSS para las que encuentra. No ejecuta el código ni mira si la clase se usa de verdad en un `className`: basta con que aparezca escrita. Lo comprobé en `dist/assets/index-<hash>.css`: están `grid-cols-3` y `bg-olive-800`, que uso en el catálogo, y no está una clase de color que no uso. Pero la primera vez sí estaba, porque Tailwind v4 lee todos los ficheros que no están en `.gitignore`, y el `ENUNCIADO.md` la nombra como ejemplo. Lo arreglé con `@import "tailwindcss" source(".");` en `src/styles.css`, para que sólo lea `src/`. Por la misma razón, los nombres de clase no se pueden construir concatenando trozos (`"bg-" + color`): la cadena completa tiene que estar escrita en algún sitio para que la encuentre. Las reglas de `.brand-header` de Sass acaban en el mismo fichero CSS, porque Vite junta todo el CSS importado desde `index.tsx`.
 
 ### Opcional 2 · Code splitting y análisis del bundle
 
@@ -88,21 +88,34 @@ Cambié `shipping` a `import { shippingCost } from "./shipping";` y, al construi
 
 Lo que no hace falta para ver el catálogo y que sólo usan algunos usuarios o en algún momento concreto: el proceso de pago (formularios, validaciones y la librería de la pasarela), el carrito completo, el área de cuenta del usuario, el panel de administración, un editor de reseñas, un mapa de tiendas o un visor de imágenes con zoom. También cada página o ruta, para que quien entra en la portada no descargue el código del resto de la tienda.
 
+![Informe de vite-bundle-analyzer con el chunk principal](docs/opcional2-analyzer.png)
+
+**¿Qué es lo que más ocupa del chunk principal?**
+
+React DOM. En el informe, `index-<hash>.js` está ocupado casi entero por `node_modules/react-dom/cjs/react-dom-client.production.js`, que pesa 198.10 kB de unos 216 kB (alrededor del 91 %). Lo que queda es `react` (con `jsx-runtime`), `scheduler`, que también es de React, y mi propio código, que apenas se ve: `app.tsx` ocupa en torno a 1 kB. Es decir, casi todo lo que descarga el usuario al entrar es la librería, no la tienda.
+
+**¿Por qué Vite saca `loglevel` a un fichero aparte en lugar de copiarlo dentro de cada chunk?**
+
+Porque lo importan dos chunks distintos, `cart` y `shipping`. Si lo copiara dentro de cada uno, el usuario descargaría el mismo código dos veces al pulsar "Calcular total", y además habría dos copias de la librería en memoria, cada una con su propio estado. Al sacarlo a `loglevel-<hash>.js`, los dos chunks lo importan de ese fichero: se descarga una sola vez (al pulsar el botón se piden tres ficheros, `cart`, `shipping` y `loglevel`) y luego sale de la caché. Tampoco lo mete en el chunk principal, porque sólo lo usan los módulos que se cargan bajo demanda.
+
 ## Salida final de `npm run build`
 
 ```text
 vite v8.3.5 building client environment for production...
 transforming...
-✓ 19 modules transformed.
+✓ 24 modules transformed.
 rendering chunks...
 computing gzip size...
 dist/assets/favicon-BlvYJjdG.svg      0.33 kB │ gzip:  0.21 kB
 dist/index.html                       1.32 kB │ gzip:  0.64 kB
 dist/assets/coffee-kqAJzOdl.jpg   2,081.12 kB
-dist/assets/index-qRAdAvCk.css        1.64 kB │ gzip:  0.84 kB
-dist/assets/index-DSifi2Nh.js       220.23 kB │ gzip: 68.96 kB
+dist/assets/index-vVYCwBAx.css        8.83 kB │ gzip:  2.70 kB
+dist/assets/shipping-B09E3JPq.js      0.18 kB │ gzip:  0.17 kB │ map:     0.43 kB
+dist/assets/cart-Dd5rd-BU.js          0.19 kB │ gzip:  0.17 kB │ map:     0.54 kB
+dist/assets/loglevel-BSqoRXSl.js      3.23 kB │ gzip:  1.38 kB │ map:    16.59 kB
+dist/assets/index-B8njQvpx.js       223.21 kB │ gzip: 70.20 kB │ map: 1,047.87 kB
 
-✓ built in 311ms
+✓ built in 2.96s
 ```
 
 ## Checklist

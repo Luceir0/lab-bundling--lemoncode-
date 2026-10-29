@@ -173,3 +173,35 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** revisó `docs/opcional2-analyzer.png` y sacó las cifras de los datos de `dist/bundle-report.html`: dentro de `index-<hash>.js` (216.5 kB), `react-dom-client.production.js` ocupa 198 kB (~91 %) y mi `app.tsx` 1.2 kB. Me sugirió repetir la captura haciendo zoom en el chunk principal (o quitando la foto desde el menú ☰), porque la foto de 2 MB tapa casi todo y la pregunta es sobre el chunk principal.
 
 **Qué corregí y por qué:** nada por ahora.
+
+### [Entrega] Revisión final del proyecto
+
+**Prompt:** "Hecho. Podrías analizar el proyecto por si nos falta algo?"
+
+**Qué me dio:** comparó el repo con el checklist de entrega y el obligatorio 7: build sin errores, commits subidos, nada de `node_modules`/`dist`/`.env.local` en git, capturas enlazadas. Encontró que la respuesta de Tailwind del README cita `bg-amber-700`, que ya no está en el CSS porque cambié los colores de los botones, y que la "Salida final de `npm run build`" del README es la de antes de los opcionales. Sugirió limpiar campos sobrantes de `package.json` (`main`, `directories`, script `test`).
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Entrega] Aplicar las correcciones de la revisión
+
+**Prompt:** "podrías aplicar estos cambios?"
+
+**Qué me dio:** cambió `bg-amber-700` por `bg-olive-800` en la respuesta de Tailwind, sustituyó la salida del build del README por la actual (con `cart`, `shipping` y `loglevel`) y quitó de `package.json` `main`, `directories` y el script `test`. Comprobó que el build sigue funcionando y que `bg-olive-800` está en el CSS.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Entrega] Comprobar si está todo para entregar
+
+**Prompt:** "teniendo en cuenta el enunciado, podrías decirme si está todo hecho y es entregable?"
+
+**Qué me dio:** repasó el enunciado punto por punto contra el código, el README y git. El build pasa y los obligatorios están completos, pero en el README faltan las dos respuestas de la parte B del opcional 2 (qué ocupa más del chunk principal, con la captura `docs/opcional2-analyzer.png` enlazada, y por qué `loglevel` sale en un chunk aparte). Además, los cambios de la revisión anterior (README, `package.json`, `notas-ia.md`) están sin commit ni push.
+
+**Qué corregí y por qué:** nada por ahora.
+
+### [Entrega] Completar el opcional 2 B y subir los cambios
+
+**Prompt:** "Haz entonces eso que falta. Ya he cambiado la imagen del chunk para que se vea mejor"
+
+**Qué me dio:** revisó la captura nueva y los tamaños de `dist/bundle-report.html`, y redactó en el README las dos respuestas de la parte B (lo que más ocupa del chunk principal, con la captura enlazada, y por qué `loglevel` sale en un chunk aparte). Después hizo commit y push de los cambios pendientes.
+
+**Qué corregí y por qué:** nada por ahora.
