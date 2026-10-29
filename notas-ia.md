@@ -30,29 +30,13 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 
 **Qué corregí y por qué:** nada por ahora. Es un resumen: el detalle exacto (código, comandos) hay que seguir mirándolo en `ENUNCIADO.md`.
 
-### [Paso 0] Crear el repositorio git y subirlo a GitHub
-
-**Prompt:** "¿Cómo puedo hacer para crear un proyecto de git en este proyecto, para después subirlo a GitHub?"
-
-**Qué me dio:** los pasos: `git init`, crear el `.gitignore` (lo decido yo según el enunciado), primer commit, crear el repo vacío en GitHub y enlazarlo con `git remote add origin` + `git push -u origin main`.
-
-**Qué corregí y por qué:** nada por ahora.
-
 ### [Paso 0] Contenido del .gitignore
 
-**Prompt:** "En verdad no sé qué sería bueno meter en .gitignore. ¿Podrías decirme qué es lo más conveniente y ponerlo?"
+**Prompt:** "No sé qué sería bueno meter en .gitignore. ¿Podrías decirme qué es lo más conveniente y ponerlo?"
 
 **Qué me dio:** movió mi `.gitignore` de `docs/` a la raíz (en `docs/` solo afectaba a esa carpeta) y lo completó: `node_modules`, `dist`, `.env.local` / `*.local`, logs, ficheros del sistema y del editor. Decidió que `.env` y `.env.production` sí se suben porque solo llevan valores públicos `VITE_*`, que acaban igualmente escritos en el bundle.
 
 **Qué corregí y por qué:** nada por ahora.
-
-### [Paso 0] Excluir mis apuntes del repo
-
-**Prompt:** "¿Puedes meter también el enunciado-paso-a-paso en gitignore?"
-
-**Qué me dio:** añadió `enunciado-paso-a-paso.md` al `.gitignore` en una sección "Apuntes personales".
-
-**Qué corregí y por qué:** nada.
 
 ### [Paso 1] Qué comprobar después del build
 
@@ -61,22 +45,6 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 **Qué me dio:** desglosó las comprobaciones del paso 1 en `enunciado-paso-a-paso.md` (qué mirar en `dist/`, `preview` en el 4173, `start` en el 5173, el 304, el `?t=` y `new Date(...)`). Además detectó dos fallos en mi `index.html`: faltaba la cabecera con el nombre de la tienda y había un acento grave (`) suelto dentro del `<head>`.
 
 **Qué corregí y por qué:** nada de lo que me dio; apliqué los dos arreglos que me señaló (añadir la cabecera `<header><h1>Tueste</h1></header>` y borrar el acento grave suelto).
-
-### [Repo] Subir el repositorio a GitHub
-
-**Prompt:** "He creado un repositorio en GitHub para este repositorio local. Las instrucciones son estas: `git remote add origin ...`, `git branch -M main`, `git push -u origin main`. ¿Podrías hacerlo?"
-
-**Qué me dio:** ejecutó los tres comandos: añadió el remoto `origin`, dejó la rama como `main` y subió los dos commits existentes, con `main` siguiendo a `origin/main`. Me avisó de que los cambios sin commitear (`index.html` y `src/assets/`) no se subieron.
-
-**Qué corregí y por qué:** nada.
-
-### [Paso 3] Importar la foto desde JS
-
-**Prompt:** "Vale, seguimos ahora con el siguiente paso?"
-
-**Qué me dio:** vio que el logo ya estaba en la cabecera y añadió a `src/index.js` el código del enunciado para importar `./assets/coffee.jpg`, mostrarla con `console.log` y meterla en el `body`. La foto la tengo que descargar yo.
-
-**Qué corregí y por qué:** nada por ahora.
 
 ### [Paso 4] Modo estricto y vite-plugin-checker
 
@@ -110,25 +78,9 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 
 **Qué corregí y por qué:** la explicación era incorrecta y la propia IA la rectificó al mirar el reset: no es cuestión de orden sino de capas. Tailwind v4 mete sus clases en `@layer utilities`, y cualquier regla **fuera** de una capa (como todo mi `_reset.scss`) gana a cualquier regla dentro de una capa, se cargue antes o después. Así, `* { padding: 0 }` o `button { background: none }` del reset anularían `p-4` o `bg-amber-700`. Solución: meter el reset en `@layer base`.
 
-### [Opcional 1] Catálogo con Tailwind y comprobación en dist
-
-**Prompt:** "Vale, puedes hacer ambas cosas?"
-
-**Qué me dio:** metió el reset en `@layer base` con `meta.load-css("reset")` en `main.scss` y puso las clases de Tailwind en el catálogo de `app.tsx` (rejilla `grid sm:grid-cols-3 gap-4`, borde, sombra, botón ámbar). Al revisar el CSS de `dist` vio que `bg-pink-500` **sí** salía: Tailwind v4 lee todos los ficheros del proyecto que no estén en `.gitignore`, y `ENUNCIADO.md` la nombra como ejemplo. Lo arregló con `@import "tailwindcss" source(".");` en `src/styles.css`, para que sólo lea `src/`.
-
-**Qué corregí y por qué:** nada por ahora.
-
-### [Opcional 1] Respuesta del README
-
-**Prompt:** "Vale, puedes darme la respuesta para el readme?"
-
-**Qué me dio:** un borrador de la respuesta a "¿cómo sabe Tailwind qué clases meter en el CSS final?", basado en lo que vimos en `dist` (incluido lo de `ENUNCIADO.md` y `source(".")`) y sin escribir nombres de clases que no uso.
-
-**Qué corregí y por qué:** nada por ahora.
-
 ### [Opcional 1] Error de VS Code con `source(".")`
 
-**Prompt:** "Por qué esto me da error en styles.css ?: `@import "tailwindcss" source(".");`" y luego "Vale, hagamos eso"
+**Prompt:** "Por qué esto me da error en styles.css ?: `@import "tailwindcss" source(".");`"
 
 **Qué me dio:** explicó que no es un error real sino del comprobador de CSS de VS Code (`css-semicolonexpected`), que no conoce la sintaxis de Tailwind v4; el build funciona. Como la extensión Tailwind CSS IntelliSense ya estaba instalada, creó `.vscode/settings.json` con `"files.associations": { "*.css": "tailwindcss" }` (no se sube: `.vscode/*` está en `.gitignore`).
 
@@ -142,22 +94,6 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 
 **Qué corregí y por qué:** nada por ahora.
 
-### [Opcional 2] Comprobar los chunks de cart y shipping
-
-**Prompt:** "Hecho. Cómo podemos continuar?"
-
-**Qué me dio:** ejecutó el build y confirmó que salen `cart-<hash>.js` (0.06 kB) y `shipping-<hash>.js` (0.04 kB) aparte de `index-<hash>.js`; comprobó también que `bg-olive-800`, que puse yo en el botón "Añadir", existe en Tailwind 4.3 y está en el CSS. Me explicó qué mirar en Network con `preview` y cómo hacer la prueba de la pregunta 1.
-
-**Qué corregí y por qué:** nada por ahora.
-
-### [Opcional 2] Parte B: analizador y loglevel
-
-**Prompt:** "hecho, sigamos"
-
-**Qué me dio:** los pasos de la parte B: instalar `vite-bundle-analyzer` (en `devDependencies`) y `loglevel` (en `dependencies`, porque va en el código que llega al navegador), añadir `analyzer(...)` en modo estático a `vite.config.ts` y usar `log.warn(...)` en `cart.ts` y `shipping.ts`.
-
-**Qué corregí y por qué:** nada por ahora.
-
 ### [Opcional 2] Revisión de la parte B
 
 **Prompt:** "hecho. Podrías comprobar qué tal está implementada la solución?"
@@ -166,27 +102,11 @@ Fichero de trabajo: aquí se apunta, **mientras se trabaja**, cada interacción 
 
 **Qué corregí y por qué:** nada por ahora.
 
-### [Opcional 2] Revisión de la captura del analizador
-
-**Prompt:** "hecho, podrías comprobarlo?"
-
-**Qué me dio:** revisó `docs/opcional2-analyzer.png` y sacó las cifras de los datos de `dist/bundle-report.html`: dentro de `index-<hash>.js` (216.5 kB), `react-dom-client.production.js` ocupa 198 kB (~91 %) y mi `app.tsx` 1.2 kB. Me sugirió repetir la captura haciendo zoom en el chunk principal (o quitando la foto desde el menú ☰), porque la foto de 2 MB tapa casi todo y la pregunta es sobre el chunk principal.
-
-**Qué corregí y por qué:** nada por ahora.
-
 ### [Entrega] Revisión final del proyecto
 
 **Prompt:** "Hecho. Podrías analizar el proyecto por si nos falta algo?"
 
 **Qué me dio:** comparó el repo con el checklist de entrega y el obligatorio 7: build sin errores, commits subidos, nada de `node_modules`/`dist`/`.env.local` en git, capturas enlazadas. Encontró que la respuesta de Tailwind del README cita `bg-amber-700`, que ya no está en el CSS porque cambié los colores de los botones, y que la "Salida final de `npm run build`" del README es la de antes de los opcionales. Sugirió limpiar campos sobrantes de `package.json` (`main`, `directories`, script `test`).
-
-**Qué corregí y por qué:** nada por ahora.
-
-### [Entrega] Aplicar las correcciones de la revisión
-
-**Prompt:** "podrías aplicar estos cambios?"
-
-**Qué me dio:** cambió `bg-amber-700` por `bg-olive-800` en la respuesta de Tailwind, sustituyó la salida del build del README por la actual (con `cart`, `shipping` y `loglevel`) y quitó de `package.json` `main`, `directories` y el script `test`. Comprobó que el build sigue funcionando y que `bg-olive-800` está en el CSS.
 
 **Qué corregí y por qué:** nada por ahora.
 
